@@ -23,4 +23,6 @@ configuration:
       type: string
     tags:
       type: [array, string]
+    add-host:
+      type: [array, string]
   required: ['ecr-name']

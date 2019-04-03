@@ -55,6 +55,13 @@ read_tags() {
   fi
 }
 
+read_add_host() {
+  read_list_property 'ADD_HOST'
+  for arg in ${result[@]+"${result[@]}"}; do
+    add_host+=('--add-host' "${arg}")
+  done
+}
+
 # read a plugin property of type [array, string] into a Bash array. Buildkite
 # exposes a string value at BUILDKITE_PLUGIN_{NAME}_{KEY}, and array values at
 # BUILDKITE_PLUGIN_{NAME}_{KEY}_{IDX}.
@@ -107,11 +114,13 @@ image="$(get_ecr_url "${BUILDKITE_PLUGIN_DOCKER_ECR_PUBLISH_ECR_NAME}")"
 
 build_args=()
 caches_from=()
+add_host=()
 tags=("${BUILDKITE_BUILD_NUMBER}")
 
 read_build_args 'ARGS'
 read_caches_from
 read_tags 'TAGS'
+read_add_host
 
 if [[ ${BUILDKITE_BRANCH} == "${BUILDKITE_PIPELINE_DEFAULT_BRANCH}" ]]; then
   read_build_args 'DEFAULT_ARGS'
@@ -126,7 +135,7 @@ echo '--- Building Docker image'
 echo "Build args: ${build_args[*]}"
 echo "Cache from: ${caches_from[*]}"
 echo "Dockerfile: ${dockerfile}"
-docker build --file "${dockerfile}" --tag "${image}" ${build_args[@]+"${build_args[@]}"} ${caches_from[@]+"${caches_from[@]}"} .
+docker build --file "${dockerfile}" --tag "${image}" ${add_host[@]+"${add_host[@]}"} ${build_args[@]+"${build_args[@]}"} ${caches_from[@]+"${caches_from[@]}"} .
 
 echo '--- Pushing Docker image'
 push_tags "${tags[@]}"
