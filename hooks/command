@@ -132,7 +132,6 @@ else
 fi
 
 echo '--- Building Docker image'
-echo "Build args: ${build_args[*]}"
 echo "Cache from: ${caches_from[*]}"
 echo "Dockerfile: ${dockerfile}"
 docker build --file "${dockerfile}" --tag "${image}" ${add_host[@]+"${add_host[@]}"} ${build_args[@]+"${build_args[@]}"} ${caches_from[@]+"${caches_from[@]}"} .
